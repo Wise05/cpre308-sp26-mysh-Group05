@@ -118,32 +118,34 @@ static int run_builtin(Command *cmd)
 
     /* ---- cd ---- */
     if (strcmp(cmd->argv[0], "cd") == 0) {
-        /* [S1] TODO:
-         *   const char *dir = (cmd->argc > 1) ? cmd->argv[1] : getenv("HOME");
-         *   if (!dir) { fprintf(stderr, "mysh: cd: HOME not set\n"); return 0; }
-         *   if (chdir(dir) < 0) perror("cd");                                    */
+        //* [S1] TODO:
+        const char *dir = (cmd->argc > 1) ? cmd->argv[1] : getenv("HOME");
+        if (!dir) { fprintf(stderr, "mysh: cd: HOME not set\n"); return 0; }
+        if (chdir(dir) < 0) perror("cd");                                    
         return 0;
     }
 
     /* ---- pwd ---- */
     if (strcmp(cmd->argv[0], "pwd") == 0) {
-        /* [S1] TODO: use getcwd() -- NOT an external execvp call.
-         * pwd must be a true built-in so it reflects the shell's own cwd.
-         *   char buf[PATH_MAX];
-         *   if (getcwd(buf, sizeof(buf)) == NULL) perror("pwd");
-         *   else printf("%s\n", buf);                                            */
+        //* [S1] TODO: use getcwd() -- NOT an external execvp call.
+        // pwd must be a true built-in so it reflects the shell's own cwd.
+        char buf[PATH_MAX];
+        if (getcwd(buf, sizeof(buf)) == NULL) perror("pwd");
+        else printf("%s\n", buf);                                            
         return 0;
     }
 
     /* ---- pid ---- */
     if (strcmp(cmd->argv[0], "pid") == 0) {
         /* [S1] TODO: printf("%d\n", (int)getpid()); */
+        printf("%d\n", (int)getpid());
         return 0;
     }
 
     /* ---- ppid ---- */
     if (strcmp(cmd->argv[0], "ppid") == 0) {
         /* [S1] TODO: printf("%d\n", (int)getppid()); */
+        printf("%d\n", (int)getppid());
         return 0;
     }
 
