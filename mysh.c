@@ -313,6 +313,28 @@ static void apply_redirections(Command *cmd)
  */
 static void run_pipe(Command *cmd)
 {
-    (void)cmd;
-    fprintf(stderr, "mysh: pipes not yet implemented (bonus stage)\n");
+    int pfd[2];
+    pipe(pfd);                            // create pipe
+ 
+    pid_t left = fork();                  // child 1: left side of pipe
+    if (left == 0) {
+        dup2(pfd[1], STDOUT_FILENO);      // write end -> stdout
+        close(pfd[0]); close(pfd[1]);
+        execvp(cmd->argv[0], cmd->argv);
+        perror(cmd->argv[0]); exit(1);
+    }
+ 
+    pid_t right = fork();                 // child 2: right side of pipe
+    if (right == 0) {
+        dup2(pfd[0], STDIN_FILENO);       // read end -> stdin
+        close(pfd[0]); close(pfd[1]);
+        execvp(cmd->pipe_argv[0], cmd->pipe_argv);
+        perror(cmd->pipe_argv[0]); exit(1);
+    }
+ 
+    close(pfd[0]);
+    close(pfd[1]);
+ 
+    waitpid(left,  NULL, 0);
+    waitpid(right, NULL, 0);
 }
