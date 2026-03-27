@@ -197,16 +197,18 @@ static void run_external(Command *cmd)
         apply_redirections(cmd);   /* Stage 3: set up redirections  */
 
         /* [S2] TODO: call execvp here */
-
+        execvp(cmd->argv[0], cmd->argv);
         perror(cmd->argv[0]);
         exit(1);
 
     } else {
         /* --- PARENT --- */
         /* [S2] TODO: print PID, waitpid, print exit status */
+        printf("[%d] %s\n", (int)pid, cmd->argv[0]);
         int status;
         waitpid(pid, &status, 0);
-        (void)status;  /* remove this line once you use status */
+        if (WIFEXITED(status))
+            printf("[%d] %s Exit %d\n", (int)pid, cmd->argv[0], WEXITSTATUS(status));
     }
 }
 
