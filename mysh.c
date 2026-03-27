@@ -240,10 +240,34 @@ static void run_external(Command *cmd)
  */
 static void apply_redirections(Command *cmd)
 {
-    /* [S3] TODO: implement input redirection (cmd->input_file)  */
-    /* [S3] TODO: implement output redirection (cmd->output_file) */
-    (void)cmd;  /* remove this line once you start implementing */
-}
+    if (cmd->input_file != NULL) {
+        int fd_in = open(cmd->input_file, O_RDONLY);
+        if (fd_in < 0) {
+            perror("mysh: input file");
+            exit(1);
+        }
+
+        if (dup2(fd_in, STDIN_FILENO) < 0) {
+            perror("dup2 input");
+            exit(1);
+        }
+        close(fd_in);
+    }
+
+    if (cmd->output_file != NULL) {
+        int flags = O_WRONLY | O_CREAT | (cmd->append ? O_APPEND : O_TRUNC);
+        
+        int fd_out = open(cmd->output_file, flags, 0644);
+        if (fd_out < 0) {
+            perror("mysh: output file");
+            exit(1);
+        }
+        if (dup2(fd_out, STDOUT_FILENO) < 0) {
+            perror("dup2 output");
+            exit(1);
+        }
+        close(fd_out);
+    }}
 
 /* ================================================================== */
 /* Bonus Stage -- Pipes  (+10 pts extra credit)                        */
